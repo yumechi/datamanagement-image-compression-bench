@@ -1,8 +1,8 @@
 [package]
-name = "image_comparison_quality"
+name = "compression_format_comparison"
 version = "0.1.0"
 edition = "2024"
-default-run = "image_comparison_quality"
+default-run = "compression_format_comparison"
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
@@ -11,7 +11,7 @@ serde = { version = "1.0", features = ["derive"] }
 rand = "0.8"
 
 [[bin]]
-name = "image_comparison_quality"
+name = "compression_format_comparison"
 path = "src/main.rs"
 
 [[bin]]

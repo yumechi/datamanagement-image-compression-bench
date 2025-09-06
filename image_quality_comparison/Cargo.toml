@@ -1,8 +1,8 @@
 [package]
-name = "image_comparison_format"
+name = "image_quality_comparison"
 version = "0.1.0"
 edition = "2024"
-default-run = "image_comparison_format"
+default-run = "image_quality_comparison"
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
@@ -11,7 +11,7 @@ serde = { version = "1.0", features = ["derive"] }
 rand = "0.8"
 
 [[bin]]
-name = "image_comparison_format"
+name = "image_quality_comparison"
 path = "src/main.rs"
 
 [[bin]]

@@ -20,24 +20,24 @@ struct ImageQualityStats {
 }
 
 fn print_help() {
-    println!("画像品質比較ベンチマーク");
+    println!("画像品質比較ベンチマーク（テスト版）");
     println!("");
     println!("使用方法:");
-    println!("  {} [画像枚数] [ラウンド数]", env::args().next().unwrap_or_else(|| "program".to_string()));
+    println!("  {} [画像枚数] [ラウンド数]", env::args().next().unwrap_or_else(|| "test_program".to_string()));
     println!("");
     println!("引数:");
-    println!("  画像枚数    各ラウンドで生成する画像の枚数 (デフォルト: 100)");
-    println!("  ラウンド数  ベンチマークの実行回数 (デフォルト: 10)");
+    println!("  画像枚数    各ラウンドで生成する画像の枚数 (デフォルト: 5)");
+    println!("  ラウンド数  ベンチマークの実行回数 (デフォルト: 1)");
     println!("");
     println!("オプション:");
     println!("  -h, --help  このヘルプメッセージを表示");
     println!("");
     println!("例:");
-    println!("  {}           # デフォルト: 100枚、10ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
-    println!("  {} 50        # 50枚、10ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
-    println!("  {} 200 5     # 200枚、5ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
+    println!("  {}           # デフォルト: 5枚、1ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
+    println!("  {} 10        # 10枚、1ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
+    println!("  {} 20 2      # 20枚、2ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
     println!("");
-    println!("品質設定: PNG→WebP変換で100%から50%まで10%刻みで品質比較を実行");
+    println!("品質設定: PNG→WebP変換で100%、80%、60%の3段階で品質比較（テスト版）");
 }
 
 fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
@@ -52,14 +52,14 @@ fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
         args[1].parse::<u32>()
             .map_err(|_| "画像枚数は正の整数で指定してください")?
     } else {
-        100
+        5  // テスト版のデフォルト
     };
     
     let rounds = if args.len() > 2 {
         args[2].parse::<u32>()
             .map_err(|_| "ラウンド数は正の整数で指定してください")?
     } else {
-        10
+        1  // テスト版のデフォルト
     };
     
     if image_count == 0 {
@@ -77,18 +77,18 @@ fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (image_count, rounds) = parse_args()?;
     
-    println!("画像品質比較ベンチマーク開始: {}枚の画像で{}ラウンド実行", image_count, rounds);
-    println!("品質設定: 100%から50%まで10%刻みで比較");
+    println!("画像品質比較ベンチマーク（テスト版）開始: {}枚の画像で{}ラウンド実行", image_count, rounds);
+    println!("品質設定: 100%, 80%, 60%の3段階で比較");
     
-    let mut csv_writer = Writer::from_path("image_comparison_quality_results.csv")?;
+    let mut csv_writer = Writer::from_path("image_quality_comparison_test_results.csv")?;
     
-    // 品質設定（100%から50%まで10%刻み）
-    let quality_levels = [100, 90, 80, 70, 60, 50];
+    // テスト用品質設定（3段階）
+    let quality_levels = [100, 80, 60];
     
     for run in 1..=rounds {
-        println!("実行回数: {}/{}", run, rounds);
+        println!("実行回数: {}/{}（テスト）", run, rounds);
         
-        let output_dir = format!("images_run_{}", run);
+        let output_dir = format!("test_images_run_{}", run);
         fs::create_dir_all(&output_dir)?;
         
         // ランダムなPNG画像を生成（4並列）
@@ -118,7 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // 実験終了後の最終クリーンアップ
     cleanup_remaining_files(rounds)?;
-    println!("全ての実行が完了しました。結果はimage_comparison_quality_results.csvに保存されました。");
+    println!("全ての実行が完了しました。結果はimage_quality_comparison_test_results.csvに保存されました。");
     
     Ok(())
 }
@@ -239,13 +239,13 @@ fn calculate_png_stats(output_dir: &str, run_number: u32, image_count: u32) -> R
     
     Ok(ImageQualityStats {
         run_number,
-        quality: 100, // PNG is lossless
+        quality: 100,
         total_size,
         average_size,
         min_size,
         max_size,
         median_size,
-        compression_ratio: 1.0, // baseline
+        compression_ratio: 1.0,
     })
 }
 
@@ -310,7 +310,7 @@ fn cleanup_images(output_dir: &str, image_count: u32, quality_levels: &[u32]) ->
 
 fn cleanup_remaining_files(rounds: u32) -> Result<(), Box<dyn std::error::Error>> {
     for run in 1..=rounds {
-        let dir_name = format!("images_run_{}", run);
+        let dir_name = format!("test_images_run_{}", run);
         if fs::metadata(&dir_name).is_ok() {
             let entries = fs::read_dir(&dir_name)?;
             for entry in entries {

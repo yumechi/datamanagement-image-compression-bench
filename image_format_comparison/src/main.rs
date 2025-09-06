@@ -19,22 +19,22 @@ struct ImageStats {
 }
 
 fn print_help() {
-    println!("画像フォーマット比較ベンチマーク（テスト版）");
+    println!("画像フォーマット比較ベンチマーク");
     println!("");
     println!("使用方法:");
-    println!("  {} [画像枚数] [ラウンド数]", env::args().next().unwrap_or_else(|| "test_program".to_string()));
+    println!("  {} [画像枚数] [ラウンド数]", env::args().next().unwrap_or_else(|| "program".to_string()));
     println!("");
     println!("引数:");
-    println!("  画像枚数    各ラウンドで生成する画像の枚数 (デフォルト: 5)");
-    println!("  ラウンド数  ベンチマークの実行回数 (デフォルト: 1)");
+    println!("  画像枚数    各ラウンドで生成する画像の枚数 (デフォルト: 100)");
+    println!("  ラウンド数  ベンチマークの実行回数 (デフォルト: 10)");
     println!("");
     println!("オプション:");
     println!("  -h, --help  このヘルプメッセージを表示");
     println!("");
     println!("例:");
-    println!("  {}           # デフォルト: 5枚、1ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
-    println!("  {} 10        # 10枚、1ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
-    println!("  {} 20 2      # 20枚、2ラウンド", env::args().next().unwrap_or_else(|| "test_program".to_string()));
+    println!("  {}           # デフォルト: 100枚、10ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
+    println!("  {} 50        # 50枚、10ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
+    println!("  {} 200 5     # 200枚、5ラウンド", env::args().next().unwrap_or_else(|| "program".to_string()));
 }
 
 fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
@@ -50,14 +50,14 @@ fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
         args[1].parse::<u32>()
             .map_err(|_| "画像枚数は正の整数で指定してください")?
     } else {
-        5  // テスト版のデフォルト
+        100
     };
     
     let rounds = if args.len() > 2 {
         args[2].parse::<u32>()
             .map_err(|_| "ラウンド数は正の整数で指定してください")?
     } else {
-        1  // テスト版のデフォルト
+        10
     };
     
     if image_count == 0 {
@@ -75,14 +75,14 @@ fn parse_args() -> Result<(u32, u32), Box<dyn std::error::Error>> {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (image_count, rounds) = parse_args()?;
     
-    println!("画像フォーマット比較ベンチマーク（テスト版）開始: {}枚の画像で{}ラウンド実行", image_count, rounds);
+    println!("画像フォーマット比較ベンチマーク開始: {}枚の画像で{}ラウンド実行", image_count, rounds);
     
-    let mut csv_writer = Writer::from_path("image_comparison_format_test_results.csv")?;
+    let mut csv_writer = Writer::from_path("image_format_comparison_results.csv")?;
     
     for run in 1..=rounds {
-        println!("実行回数: {}/{}（テスト）", run, rounds);
+        println!("実行回数: {}/{}", run, rounds);
         
-        let output_dir = format!("test_images_run_{}", run);
+        let output_dir = format!("images_run_{}", run);
         fs::create_dir_all(&output_dir)?;
         
         // ランダムなPNG画像を生成（4並列）
@@ -116,7 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // 実験終了後の最終クリーンアップ
     cleanup_remaining_files(rounds)?;
-    println!("全ての実行が完了しました。結果はimage_comparison_format_test_results.csvに保存されました。");
+    println!("全ての実行が完了しました。結果はimage_format_comparison_results.csvに保存されました。");
     
     Ok(())
 }
@@ -285,7 +285,7 @@ fn cleanup_images(output_dir: &str, image_count: u32) -> Result<(), Box<dyn std:
 fn cleanup_remaining_files(rounds: u32) -> Result<(), Box<dyn std::error::Error>> {
     // 残存する可能性のある画像ディレクトリをクリーンアップ
     for run in 1..=rounds {
-        let dir_name = format!("test_images_run_{}", run);
+        let dir_name = format!("images_run_{}", run);
         if fs::metadata(&dir_name).is_ok() {
             // ディレクトリ内のファイルを全て削除
             let entries = fs::read_dir(&dir_name)?;

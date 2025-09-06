@@ -1,0 +1,15 @@
+/target/
+**/*.rs.bk
+Cargo.lock
+*.csv
+*.png
+*.jpg
+*.webp
+*.zip
+*.tar.gz
+*.zst
+*.xz
+*.7z
+images_run_*/
+test_images_run_*/
+test.png
