@@ -92,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let benchmark_dir = "benchmark_images";
     fs::create_dir_all(benchmark_dir)?;
     
-    // 画像ファイル生成（4並列）
+    // 画像ファイル生成（8並列）
     println!("ベンチマーク用画像{}枚を生成中...", image_count);
     generate_random_png_images_parallel(benchmark_dir, image_count).await?;
     let original_size = calculate_directory_size(benchmark_dir)?;
@@ -149,10 +149,10 @@ async fn generate_random_png_images_parallel(output_dir: &str, count: u32) -> Re
     let mut join_set = JoinSet::new();
     let output_dir = Arc::new(output_dir.to_string());
     
-    let chunk_size = count / 4;
-    for thread_id in 0..4 {
+    let chunk_size = count / 8;
+    for thread_id in 0..8 {
         let start = thread_id * chunk_size;
-        let end = if thread_id == 3 { count } else { (thread_id + 1) * chunk_size };
+        let end = if thread_id == 7 { count } else { (thread_id + 1) * chunk_size };
         let output_dir_clone = Arc::clone(&output_dir);
         
         join_set.spawn(async move {

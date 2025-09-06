@@ -147,10 +147,10 @@ async fn generate_random_png_images_parallel(output_dir: &str, count: u32) -> Re
     let mut join_set = JoinSet::new();
     let output_dir = Arc::new(output_dir.to_string());
     
-    let chunk_size = count / 4;
-    for thread_id in 0..4 {
+    let chunk_size = count / 8;
+    for thread_id in 0..8 {
         let start = thread_id * chunk_size;
-        let end = if thread_id == 3 { count } else { (thread_id + 1) * chunk_size };
+        let end = if thread_id == 7 { count } else { (thread_id + 1) * chunk_size };
         let output_dir_clone = Arc::clone(&output_dir);
         
         join_set.spawn(async move {
