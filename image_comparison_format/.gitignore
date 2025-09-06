@@ -1,3 +1,10 @@
-/target
-/images_run_*/
-image_comparison_format_results.csv
+/target/
+**/*.rs.bk
+Cargo.lock
+*.csv
+*.png
+*.jpg
+*.webp
+images_run_*/
+test_images_run_*/
+test.png
