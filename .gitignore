@@ -1,25 +1,41 @@
-# Rust
-/target/
-**/*.rs.bk
-Cargo.lock
-
-# Generated files
-*.csv
-*.png
-*.jpg
-*.webp
-images_run_*/
-test_images_run_*/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
+# General
 .DS_Store
 Thumbs.db
-
-# Temporary files
+*.log
 *.tmp
-*.temp
-test.png
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build/coverage (not used for this app, but common)
+build/
+dist/
+site/
+htmlcov/
+.coverage*
+coverage.xml
+
+# Streamlit
+.streamlit/secrets.toml
+streamlit.log
+
+# uv / lockfiles
+# Keep uv.lock in VCS for applications; do NOT ignore it.
+# If a local override file is used, ignore it here:
+uv.local.toml
+
