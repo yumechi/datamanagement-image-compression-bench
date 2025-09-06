@@ -8,8 +8,13 @@ Cargo.lock
 *.zip
 *.tar.gz
 *.zst
+*.tar.zst
+*.tar.xz
 *.xz
 *.7z
+*.tar
+benchmark_images/
+test_benchmark_images/
 images_run_*/
 test_images_run_*/
 test.png
