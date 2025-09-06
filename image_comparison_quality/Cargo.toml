@@ -1,0 +1,19 @@
+[package]
+name = "image_comparison_quality"
+version = "0.1.0"
+edition = "2024"
+default-run = "image_comparison_quality"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+csv = "1.3"
+serde = { version = "1.0", features = ["derive"] }
+rand = "0.8"
+
+[[bin]]
+name = "image_comparison_quality"
+path = "src/main.rs"
+
+[[bin]]
+name = "test_program"
+path = "src/test.rs"
