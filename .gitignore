@@ -38,4 +38,3 @@ streamlit.log
 # Keep uv.lock in VCS for applications; do NOT ignore it.
 # If a local override file is used, ignore it here:
 uv.local.toml
-
