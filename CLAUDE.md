@@ -9,6 +9,7 @@
 - **対象領域**: データ管理技術の比較検討とベンチマーク
 - **主要な研究テーマ**:
   - 画像処理と圧縮技術の比較
+  - ファイルシステムI/O性能評価
   - データ可視化ツール
 
 ## プロジェクト構成
@@ -24,6 +25,10 @@
 ### image_quality_comparison/
 - Rust実装の画像品質比較ベンチマークツール
 - 詳細は `image_quality_comparison/CLAUDE.md` を参照
+
+### file_write_benchmark/
+- Rust実装のファイル書き込みベンチマークツール
+- 詳細は `file_write_benchmark/CLAUDE.md` を参照
 
 ### python_visualization/
 - Pythonベースのデータ可視化ツール（Streamlit）

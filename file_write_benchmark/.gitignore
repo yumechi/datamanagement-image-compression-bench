@@ -1,0 +1,10 @@
+# Rust
+/target/
+Cargo.lock
+
+# ベンチマーク結果CSV
+*.csv
+
+# テスト用ディレクトリ
+/test_*/
+/run_*/
