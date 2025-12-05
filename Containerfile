@@ -10,13 +10,14 @@
 
 FROM python:3.13-slim
 
-# 必要なシステムパッケージ + 日本語フォント
+# 必要なシステムパッケージ + 日本語フォント (IPA フォント)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    fonts-noto-cjk \
+    fonts-ipafont-gothic \
     && rm -rf /var/lib/apt/lists/* \
-    && fc-cache -fv
+    && fc-cache -fv \
+    && rm -rf /root/.cache/matplotlib
 
 # Quarto をインストール
 ARG QUARTO_VERSION=1.7.31

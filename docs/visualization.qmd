@@ -7,9 +7,14 @@ title: "可視化結果"
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.font_manager as fm
 
-# 日本語フォント設定 (Noto Sans CJK を優先、なければ sans-serif)
-matplotlib.rcParams['font.family'] = ['Noto Sans CJK JP', 'Noto Sans CJK', 'sans-serif']
+# フォントキャッシュを再構築（新しいフォントを認識させる）
+fm._rebuild()
+
+# 日本語フォント設定（フォールバックリスト）
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = ['IPAexGothic', 'IPAPGothic', 'IPAGothic', 'Noto Sans CJK JP', 'DejaVu Sans']
 matplotlib.rcParams['axes.unicode_minus'] = False  # マイナス記号の文字化け防止
 
 # スタイル設定
