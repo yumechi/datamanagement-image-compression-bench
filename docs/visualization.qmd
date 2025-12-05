@@ -46,6 +46,19 @@ def get_color(fmt):
 
 画像保存時のフォーマット別ファイルサイズを比較します。
 
+::: {.callout-note}
+## ベンチマーク条件
+
+- **画像サイズ**: 1024×1024 ピクセル
+- **画像内容**: ImageMagick で生成したランダムノイズ画像（`plasma:fractal`）
+- **変換品質**: 全フォーマット quality=100（最高品質）
+- **サンプル数**: 100枚 × 10ラウンド
+- **比較対象**:
+  - PNG: 可逆圧縮（ベースライン）
+  - JPG: 非可逆圧縮（quality=100）
+  - WEBP: Google の次世代フォーマット（quality=100）
+:::
+
 ```{python}
 #| label: fig-image-format-comparison
 #| fig-cap: "画像フォーマット別の平均ファイルサイズ"
@@ -97,6 +110,20 @@ print(stats_mb.to_markdown())
 
 ファイル圧縮時のフォーマット別パフォーマンスを比較します。
 
+::: {.callout-note}
+## ベンチマーク条件
+
+- **圧縮対象**: 上記で生成した 1024×1024 PNG 画像（100枚）
+- **測定回数**: 各形式 100回
+- **比較対象**:
+  - ZIP: 汎用アーカイブ形式
+  - TAR.GZ: UNIX 標準の gzip 圧縮
+  - ZSTD: Facebook 開発の高性能圧縮
+  - XZ: 高圧縮率の LZMA2 ベース
+  - 7Z: 7-Zip の高効率圧縮形式
+- **測定項目**: 圧縮率、圧縮時間、圧縮速度（MB/s）
+:::
+
 ```{python}
 #| label: fig-compression-format-comparison
 #| fig-cap: "圧縮フォーマット別の圧縮速度"
@@ -147,6 +174,7 @@ for _, row in summary_comp.iterrows():
 ax.set_xlabel('圧縮率 (圧縮後/元サイズ)', fontsize=12)
 ax.set_ylabel('圧縮速度 (MB/s)', fontsize=12)
 ax.set_title('圧縮率 vs 圧縮速度', fontsize=14, fontweight='bold')
+ax.set_xlim(0, 1)
 ax.set_yscale('log')
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -173,6 +201,16 @@ print(comp_stats.to_markdown())
 ## 3. WEBP品質設定による影響
 
 WEBP形式の品質設定 (quality) によるファイルサイズの変化を確認します。
+
+::: {.callout-note}
+## ベンチマーク条件
+
+- **元画像**: 1024×1024 PNG（ランダムノイズ）
+- **サンプル数**: 100枚 × 10ラウンド
+- **品質レベル**: 100%, 90%, 80%, 70%, 60%, 50%（6段階）
+- **圧縮率**: WEBP サイズ / PNG サイズ（値が小さいほど高圧縮）
+- **変換**: ImageMagick の `convert -quality {N}` を使用
+:::
 
 ```{python}
 #| label: fig-webp-quality-comparison
@@ -228,9 +266,17 @@ plt.show()
 
 | 用途 | 推奨フォーマット | 理由 |
 |------|-----------------|------|
-| 高速圧縮 | ZSTD | 圧倒的な速度 |
-| 最大圧縮率 | 7Z | 最も小さいファイルサイズ |
+| 高速圧縮 | ZSTD | 圧倒的な速度（約 250 MB/s） |
 | 互換性重視 | ZIP | 広くサポート |
+
+::: {.callout-note}
+## 補足: 圧縮率について
+
+本ベンチマークでは、既に圧縮済みの画像ファイル（JPG/PNG/WEBP）を対象としたため、
+追加の圧縮によるサイズ削減効果はほとんど得られませんでした（圧縮率 ≈ 1.0）。
+
+テキストファイルや非圧縮データを対象とした場合は、各フォーマットで異なる圧縮率が期待できます。
+:::
 
 ---
 
