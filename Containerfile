@@ -14,6 +14,7 @@ FROM python:3.13-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
+    fontconfig \
     fonts-ipafont-gothic \
     && rm -rf /var/lib/apt/lists/* \
     && fc-cache -fv \
@@ -34,5 +35,5 @@ ENV PATH="/root/.local/bin:$PATH"
 WORKDIR /workspace
 
 # デフォルトコマンド: 依存同期 + レンダリング
-CMD ["sh", "-c", "uv sync && quarto render docs/"]
+CMD ["sh", "-c", "uv sync && QUARTO_PYTHON=.venv/bin/python quarto render docs/"]
 

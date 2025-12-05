@@ -7,18 +7,14 @@ title: "可視化結果"
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-import matplotlib.font_manager as fm
 
-# フォントキャッシュを再構築（新しいフォントを認識させる）
-fm._rebuild()
-
-# 日本語フォント設定（フォールバックリスト）
-matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = ['IPAexGothic', 'IPAPGothic', 'IPAGothic', 'Noto Sans CJK JP', 'DejaVu Sans']
-matplotlib.rcParams['axes.unicode_minus'] = False  # マイナス記号の文字化け防止
-
-# スタイル設定
+# スタイル設定（フォント設定より先に適用）
 plt.style.use('seaborn-v0_8-whitegrid')
+
+# 日本語フォント設定（スタイル適用後に設定して上書き）
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['IPAGothic', 'IPAPGothic', 'Noto Sans CJK JP', 'DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False  # マイナス記号の文字化け防止
 plt.rcParams['figure.figsize'] = [10, 6]
 plt.rcParams['figure.dpi'] = 150
 
