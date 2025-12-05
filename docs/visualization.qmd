@@ -1,0 +1,237 @@
+---
+title: "可視化結果"
+---
+
+```{python}
+#| label: setup
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# スタイル設定
+plt.style.use('seaborn-v0_8-whitegrid')
+plt.rcParams['font.family'] = 'DejaVu Sans'
+plt.rcParams['figure.figsize'] = [10, 6]
+plt.rcParams['figure.dpi'] = 150
+
+# カラーパレット
+FORMAT_COLORS = {
+    'JPG': '#E74C3C',
+    'JPEG': '#E74C3C',
+    'PNG': '#3498DB',
+    'WEBP': '#2ECC71',
+    'ZIP': '#9B59B6',
+    'TAR.GZ': '#F39C12',
+    'ZSTD': '#1ABC9C',
+    'XZ': '#E67E22',
+    '7Z': '#34495E',
+}
+
+def get_color(fmt):
+    return FORMAT_COLORS.get(fmt.upper(), '#7F8C8D')
+```
+
+## 概要
+
+このドキュメントでは、画像圧縮ベンチマークの結果を可視化します。
+`result_csv/` ディレクトリ配下のCSVファイルを読み込み、フォーマット別の比較を行います。
+
+---
+
+## 1. 画像フォーマット比較 (JPG / PNG / WEBP)
+
+画像保存時のフォーマット別ファイルサイズを比較します。
+
+```{python}
+#| label: fig-image-format-comparison
+#| fig-cap: "画像フォーマット別の平均ファイルサイズ"
+
+df_format = pd.read_csv('../result_csv/image_comparison_format_results.csv')
+
+# フォーマット別の平均サイズを計算
+summary = df_format.groupby('format')['average_size'].mean().sort_values(ascending=True)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+colors = [get_color(fmt) for fmt in summary.index]
+bars = ax.barh(summary.index, summary.values / 1e6, color=colors, edgecolor='white', linewidth=0.5)
+
+ax.set_xlabel('平均ファイルサイズ (MB)', fontsize=12)
+ax.set_title('画像フォーマット別 平均ファイルサイズ', fontsize=14, fontweight='bold')
+
+# 値ラベルを追加
+for bar, val in zip(bars, summary.values):
+    ax.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height()/2,
+            f'{val/1e6:.2f} MB', va='center', fontsize=10)
+
+ax.set_xlim(0, max(summary.values) / 1e6 * 1.2)
+plt.tight_layout()
+plt.show()
+```
+
+### フォーマット別統計
+
+```{python}
+#| label: format-stats-table
+
+stats = df_format.groupby('format').agg({
+    'average_size': ['mean', 'std', 'min', 'max']
+}).round(0)
+stats.columns = ['平均', '標準偏差', '最小', '最大']
+stats = stats.astype(int)
+
+# サイズをMB単位で表示
+stats_mb = stats / 1e6
+stats_mb = stats_mb.round(3)
+stats_mb.columns = ['平均 (MB)', '標準偏差 (MB)', '最小 (MB)', '最大 (MB)']
+
+print(stats_mb.to_markdown())
+```
+
+---
+
+## 2. 圧縮フォーマット比較 (ZIP / TAR.GZ / ZSTD / XZ / 7Z)
+
+ファイル圧縮時のフォーマット別パフォーマンスを比較します。
+
+```{python}
+#| label: fig-compression-format-comparison
+#| fig-cap: "圧縮フォーマット別の圧縮速度"
+
+df_comp = pd.read_csv('../result_csv/compression_format_comparison_results.csv')
+
+# フォーマット別の平均圧縮速度
+speed_summary = df_comp.groupby('format')['compression_speed_mbps'].mean().sort_values(ascending=False)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+colors = [get_color(fmt) for fmt in speed_summary.index]
+bars = ax.barh(speed_summary.index, speed_summary.values, color=colors, edgecolor='white', linewidth=0.5)
+
+ax.set_xlabel('圧縮速度 (MB/s)', fontsize=12)
+ax.set_title('圧縮フォーマット別 圧縮速度', fontsize=14, fontweight='bold')
+
+for bar, val in zip(bars, speed_summary.values):
+    ax.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2,
+            f'{val:.1f} MB/s', va='center', fontsize=10)
+
+ax.set_xlim(0, max(speed_summary.values) * 1.2)
+plt.tight_layout()
+plt.show()
+```
+
+### 圧縮率 vs 圧縮速度
+
+```{python}
+#| label: fig-compression-ratio-vs-speed
+#| fig-cap: "圧縮率と圧縮速度のトレードオフ"
+
+summary_comp = df_comp.groupby('format').agg({
+    'compression_ratio': 'mean',
+    'compression_speed_mbps': 'mean'
+}).reset_index()
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+for _, row in summary_comp.iterrows():
+    ax.scatter(row['compression_ratio'], row['compression_speed_mbps'],
+               s=200, c=get_color(row['format']), label=row['format'],
+               edgecolors='white', linewidth=1.5)
+    ax.annotate(row['format'],
+                (row['compression_ratio'], row['compression_speed_mbps']),
+                xytext=(8, 0), textcoords='offset points',
+                fontsize=11, fontweight='bold')
+
+ax.set_xlabel('圧縮率 (圧縮後/元サイズ)', fontsize=12)
+ax.set_ylabel('圧縮速度 (MB/s)', fontsize=12)
+ax.set_title('圧縮率 vs 圧縮速度', fontsize=14, fontweight='bold')
+ax.set_yscale('log')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+### 圧縮フォーマット統計
+
+```{python}
+#| label: compression-stats-table
+
+comp_stats = df_comp.groupby('format').agg({
+    'compression_ratio': 'mean',
+    'compression_time_ms': 'mean',
+    'compression_speed_mbps': 'mean'
+}).round(2)
+
+comp_stats.columns = ['圧縮率', '圧縮時間 (ms)', '圧縮速度 (MB/s)']
+print(comp_stats.to_markdown())
+```
+
+---
+
+## 3. WEBP品質設定による影響
+
+WEBP形式の品質設定 (quality) によるファイルサイズの変化を確認します。
+
+```{python}
+#| label: fig-webp-quality-comparison
+#| fig-cap: "WEBP品質設定別のファイルサイズと圧縮率"
+
+df_quality = pd.read_csv('../result_csv/image_comparison_quality_results.csv')
+
+# 品質別の平均値を計算
+quality_summary = df_quality.groupby('quality').agg({
+    'average_size': 'mean',
+    'compression_ratio': 'mean'
+}).reset_index()
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# ファイルサイズ
+ax1.plot(quality_summary['quality'], quality_summary['average_size'] / 1e6,
+         marker='o', linewidth=2, markersize=8, color='#2ECC71')
+ax1.fill_between(quality_summary['quality'], quality_summary['average_size'] / 1e6,
+                 alpha=0.3, color='#2ECC71')
+ax1.set_xlabel('品質設定 (quality)', fontsize=12)
+ax1.set_ylabel('平均ファイルサイズ (MB)', fontsize=12)
+ax1.set_title('品質設定 vs ファイルサイズ', fontsize=13, fontweight='bold')
+ax1.grid(True, alpha=0.3)
+
+# 圧縮率
+ax2.plot(quality_summary['quality'], quality_summary['compression_ratio'],
+         marker='s', linewidth=2, markersize=8, color='#E74C3C')
+ax2.fill_between(quality_summary['quality'], quality_summary['compression_ratio'],
+                 alpha=0.3, color='#E74C3C')
+ax2.set_xlabel('品質設定 (quality)', fontsize=12)
+ax2.set_ylabel('圧縮率 (圧縮後/元サイズ)', fontsize=12)
+ax2.set_title('品質設定 vs 圧縮率', fontsize=13, fontweight='bold')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+---
+
+## サマリー
+
+### 画像フォーマットの選択指針
+
+| 用途 | 推奨フォーマット | 理由 |
+|------|-----------------|------|
+| ファイルサイズ重視 | WEBP または JPG | 高い圧縮率 |
+| 画質重視（可逆） | PNG | ロスレス圧縮 |
+| バランス重視 | WEBP (quality=80-90) | サイズと画質の両立 |
+
+### 圧縮フォーマットの選択指針
+
+| 用途 | 推奨フォーマット | 理由 |
+|------|-----------------|------|
+| 高速圧縮 | ZSTD | 圧倒的な速度 |
+| 最大圧縮率 | 7Z | 最も小さいファイルサイズ |
+| 互換性重視 | ZIP | 広くサポート |
+
+---
+
+```{python}
+#| label: generation-timestamp
+#| output: asis
+import datetime
+print(f"*生成日時: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}*")
+```

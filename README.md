@@ -1,73 +1,92 @@
-# Image Format Results Viewer (Streamlit + uv)
+# Image Compression Benchmark
 
-本プロジェクトは、画像フォーマット（JPG/PNG/WEBP など）の比較結果 CSV を読み込み、Streamlit で可視化するためのアプリです。Python は uv で管理し、配布用パッケージ化は行いません（アプリ用途）。
+画像フォーマット（JPG/PNG/WEBP）および圧縮フォーマット（ZIP/TAR.GZ/ZSTD/XZ/7Z）のベンチマーク結果を可視化するプロジェクトです。
 
-## 管理方針（2025 ベストプラクティス）
-- 依存・環境管理は uv を使用
-  - 依存宣言: `pyproject.toml`
-  - ロックファイル: `uv.lock`（コミット推奨）
-  - 仮想環境: `.venv`（リポジトリローカル）
-- ドキュメント的な補助ファイル
-  - `myproject.toml`: チーム向けの人間可読メモ（スクリプト例や依存の意図を記載）。uv は直接は参照しません。
-- ビルド/配布は対象外
-  - 配布用の build/metadata は不要。アプリとして実行できれば OK。
+## 可視化結果
 
-## セットアップ
-- 依存の同期（初回/変更時）
-  - `uv sync`
-- Python の実行（以降は `.venv` を意識せず `uv run ...` を利用）
+**GitHub Pages**: [https://YOUR_USERNAME.github.io/datamanagement-image-compression-bench/](https://YOUR_USERNAME.github.io/datamanagement-image-compression-bench/)
 
-## 実行方法（Streamlit）
-- 通常起動
-  - `uv run -m streamlit run streamlit_app.py`
-- ヘッドレス/ポート指定
-  - `uv run -m streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port 8501 --server.headless true`
-- 停止/ログ
-  - 起動をバックグラウンドにする場合はシェル機能を利用（例: `... > streamlit.log 2>&1 &` / `tail -f streamlit.log` / `kill <PID>`）
+※ リポジトリの Settings → Pages で GitHub Actions からのデプロイを有効にしてください。
 
-## CSV の扱い
-- `result_csv/` 配下の `*.csv` を再帰的に自動検出（`*format*results*.csv` を優先）。UI からのアップロードも可。
-- データ構造の自動判定
-  - Long 形式: `format` 列がある（JPG/PNG/WEBP 等）
-  - Wide 形式: 列名に `jpg|jpeg|png|webp` を含む複数列（例: `psnr_jpg`, `psnr_png`）→ 自動で縦持ち化
-  - 不明な場合はサイドバーから手動指定可
-- X/Y 軸の数値列を選択、フォーマットフィルタ、ライン/散布切替、同一 X での平均集計などに対応
+## ローカルでのビルド
 
-## 依存の追加・削除・更新
-- 本番依存の追加
-  - `uv add <pkg>`
-- 開発依存の追加（lint/型/テスト等）
-  - `uv add --group dev <pkg>`
-- 依存の削除
-  - `uv remove <pkg>`
-- アップグレード（全体）
-  - `uv lock --upgrade`
-- 反映（.venv 更新）
-  - `uv sync`
+### 方法1: コンテナ使用（推奨）
+
+Podman または Docker を使用してビルドできます：
+
+```bash
+# コンテナイメージをビルドしてレンダリング
+make render
+
+# Docker を使用する場合
+CONTAINER_ENGINE=docker make render
+```
+
+### 方法2: ローカル環境
+
+```bash
+# 依存をインストール
+uv sync
+
+# Quarto をインストール（未インストールの場合）
+curl -LO https://github.com/quarto-dev/quarto-cli/releases/download/v1.7.31/quarto-1.7.31-linux-amd64.tar.gz
+mkdir -p ~/.local/bin && tar -xzf quarto-1.7.31-linux-amd64.tar.gz
+mv quarto-1.7.31 ~/.local/quarto && ln -sf ~/.local/quarto/bin/quarto ~/.local/bin/quarto
+export PATH="$HOME/.local/bin:$PATH"
+
+# レンダリング
+make render-local
+
+# プレビュー（ブラウザで確認）
+make preview
+```
+
+## プロジェクト構成
+
+```
+.
+├── docs/                    # Quarto ドキュメント
+│   ├── _quarto.yml          # Quarto 設定
+│   ├── index.qmd            # トップページ
+│   └── visualization.qmd    # 可視化ページ
+├── result_csv/              # ベンチマーク結果 CSV
+├── .github/workflows/       # GitHub Actions
+│   └── publish.yml          # GitHub Pages 自動デプロイ
+├── Containerfile            # Podman/Docker 用
+├── Makefile                 # ビルドコマンド
+└── pyproject.toml           # Python 依存定義
+```
+
+## GitHub Pages の設定
+
+1. リポジトリの Settings → Pages を開く
+2. Source で "GitHub Actions" を選択
+3. main ブランチに push すると自動でデプロイされる
+
+## 依存管理
+
+Python の依存は [uv](https://docs.astral.sh/uv/) で管理しています：
+
+```bash
+# 依存の同期
+uv sync
+
+# 依存の追加
+uv add <package>
+
+# 依存の更新
+uv lock --upgrade && uv sync
+```
 
 ## 開発ツール
-- Lint & フォーマット
-  - `uv run ruff check --fix .`
-  - `uv run ruff format .`
-- 型チェック
-  - `uv run mypy .`
-- テスト
-  - `uv run pytest -q`
 
-## 重要ファイル
-- `streamlit_app.py`: Streamlit アプリ本体
-- `pyproject.toml`: 依存と開発グループの定義（uv が参照）
-- `uv.lock`: ロックファイル（必ずコミット）
-- `myproject.toml`: チーム向けのメモ（補助的）
-- `.gitignore`: Python/uv/Streamlit ログ等を除外
-- `image_comparison_format_results.csv`: 例示的な入力 CSV（将来的に別 CSV の追加も想定）
+```bash
+# Lint
+uv run ruff check --fix .
 
-## トラブルシューティング
-- ポート競合: `--server.port` で変更
-- 外部アクセス: `--server.address 0.0.0.0` を指定
-- 権限/サンドボックスで待受け不可な場合
-  - ローカル環境での実行（推奨）: `uv run -m streamlit run streamlit_app.py`
-  - もしくは対話型 HTML の静的出力スクリプトを追加して回避（必要なら要望ください）
+# フォーマット
+uv run ruff format .
 
-## ライセンス/配布
-- 配布目的ではありません。社内/個人用途の可視化ツールとして利用してください。
+# 型チェック
+uv run mypy .
+```

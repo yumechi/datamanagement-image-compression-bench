@@ -1,0 +1,24 @@
+---
+title: "画像圧縮ベンチマーク"
+---
+
+## 概要
+
+このサイトでは、画像フォーマット（JPG/PNG/WEBP）および圧縮フォーマット（ZIP/TAR.GZ/ZSTD/XZ/7Z）のベンチマーク結果を可視化しています。
+
+## コンテンツ
+
+- [可視化結果](visualization.qmd): グラフとサマリー
+
+## データソース
+
+ベンチマーク結果は `result_csv/` ディレクトリ内の CSV ファイルから読み込んでいます：
+
+- `image_comparison_format_results.csv`: 画像フォーマット別ファイルサイズ
+- `compression_format_comparison_results.csv`: 圧縮フォーマット別パフォーマンス
+- `image_comparison_quality_results.csv`: WEBP 品質設定別結果
+
+## リポジトリ
+
+ソースコードは GitHub で公開されています。
+

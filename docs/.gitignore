@@ -1,0 +1,6 @@
+# Quarto キャッシュ
+/.quarto/
+/_freeze/
+
+# ビルド出力 (GitHub Pages は GitHub Actions でビルド)
+/_site/

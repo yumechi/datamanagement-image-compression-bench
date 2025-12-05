@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "画像圧縮ベンチマーク"
+  navbar:
+    left:
+      - href: index.qmd
+        text: ホーム
+      - href: visualization.qmd
+        text: 可視化結果
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+
+# Python 環境設定
+jupyter: python3
