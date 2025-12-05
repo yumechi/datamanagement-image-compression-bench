@@ -6,10 +6,14 @@ title: "可視化結果"
 #| label: setup
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
+
+# 日本語フォント設定 (Noto Sans CJK を優先、なければ sans-serif)
+matplotlib.rcParams['font.family'] = ['Noto Sans CJK JP', 'Noto Sans CJK', 'sans-serif']
+matplotlib.rcParams['axes.unicode_minus'] = False  # マイナス記号の文字化け防止
 
 # スタイル設定
 plt.style.use('seaborn-v0_8-whitegrid')
-plt.rcParams['font.family'] = 'DejaVu Sans'
 plt.rcParams['figure.figsize'] = [10, 6]
 plt.rcParams['figure.dpi'] = 150
 

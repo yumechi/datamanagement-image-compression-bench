@@ -10,11 +10,13 @@
 
 FROM python:3.13-slim
 
-# 必要なシステムパッケージ
+# 必要なシステムパッケージ + 日本語フォント
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/* \
+    && fc-cache -fv
 
 # Quarto をインストール
 ARG QUARTO_VERSION=1.7.31
