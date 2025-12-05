@@ -26,10 +26,10 @@ CONTAINER_ENGINE=docker make render
 
 **ローカル環境:**
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
-export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
+make render-local
+# または
 uv sync
-cd docs && quarto render
+cd docs && QUARTO_PYTHON=../.venv/bin/python quarto render
 ```
 
 ## 主要ファイル

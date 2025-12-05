@@ -10,9 +10,14 @@
 - **主要な研究テーマ**:
   - 画像処理と圧縮技術の比較
   - ファイルシステムI/O性能評価
-  - データ可視化ツール
+  - データ可視化（Quarto + GitHub Pages）
 
 ## プロジェクト構成
+
+### docs/ (可視化)
+- Quarto ベースのベンチマーク結果可視化
+- GitHub Pages で公開
+- 詳細は `AGENTS.md` を参照
 
 ### compression_format_comparison/
 - Rust実装の圧縮フォーマットベンチマークツール
@@ -30,13 +35,16 @@
 - Rust実装のファイル書き込みベンチマークツール
 - 詳細は `file_write_benchmark/CLAUDE.md` を参照
 
-### python_visualization/
-- Pythonベースのデータ可視化ツール（Streamlit）
-- 詳細は `python_visualization/CLAUDE.md` を参照（準備中）
+### result_csv/
+- ベンチマーク結果の CSV ファイル
+- 可視化ドキュメント (docs/) から参照される
 
 ## 開発環境
 - **プラットフォーム**: Linux (WSL2)
-- **言語**: プロジェクトごとに異なる（Rust, Python）
+- **言語**: Rust (ベンチマーク), Python (可視化)
+- **可視化**: Quarto + matplotlib
+- **パッケージ管理**: uv (Python), Cargo (Rust)
+- **コンテナ**: Podman / Docker
 
 ## 全体的なガイドライン
 
@@ -49,8 +57,18 @@
 - 各サブプロジェクトは独自のCLAUDE.mdで仕様を管理
 - ルートのCLAUDE.mdはプロジェクト全体の基本方針のみ記載
 - README.mdは各サブプロジェクトで詳細な使用方法を記載
+- AGENTS.md は AI エージェント向けの作業指針
 
 ### データ管理
-- ベンチマーク結果はCSV形式で保存
+- ベンチマーク結果はCSV形式で `result_csv/` に保存
 - 生成データは自動クリーンアップを推奨
 - バージョン管理対象はソースコードと設定ファイルのみ
+
+### 可視化のビルド
+```bash
+# コンテナ使用（推奨）
+make render
+
+# Docker の場合
+CONTAINER_ENGINE=docker make render
+```

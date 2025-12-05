@@ -4,9 +4,7 @@
 
 ## 可視化結果
 
-**GitHub Pages**: [https://YOUR_USERNAME.github.io/datamanagement-image-compression-bench/](https://YOUR_USERNAME.github.io/datamanagement-image-compression-bench/)
-
-※ リポジトリの Settings → Pages で GitHub Actions からのデプロイを有効にしてください。
+**GitHub Pages**: https://yumechi.work/datamanagement-image-compression-bench/
 
 ## ローカルでのビルド
 

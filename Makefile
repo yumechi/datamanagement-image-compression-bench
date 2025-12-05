@@ -33,12 +33,12 @@ render: container-build
 # ローカル環境でレンダリング
 render-local:
 	uv sync
-	cd docs && quarto render
+	cd docs && QUARTO_PYTHON=../.venv/bin/python quarto render
 
 # ローカルプレビュー
 preview:
 	uv sync
-	cd docs && quarto preview
+	cd docs && QUARTO_PYTHON=../.venv/bin/python quarto preview
 
 # 生成ファイルを削除
 clean:
