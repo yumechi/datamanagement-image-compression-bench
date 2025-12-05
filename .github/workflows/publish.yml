@@ -46,7 +46,7 @@ jobs:
           cd docs
           quarto render
         env:
-          QUARTO_PYTHON: .venv/bin/python
+          QUARTO_PYTHON: ${{ github.workspace }}/.venv/bin/python
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
